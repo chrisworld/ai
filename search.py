@@ -19,6 +19,20 @@ Pacman agents (in searchAgents.py).
 
 import util
 
+class Vertex:
+    def __init__(self, n):
+        self.name = n
+        self.neighbors = list()
+        self.visited = 0
+        self.parent = 0
+        self.action = 'Stop'
+
+    def addNeighbor(self, v):
+        if v not in self.neighbors:
+            self.neighbors.append(v)
+            self.neighbors.sort()
+
+
 class SearchProblem:
     """
     This class outlines the structure of a search problem, but doesn't implement
@@ -87,12 +101,36 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    
-    print "Start:", problem.getStartState()
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
 
-    util.raiseNotDefined()
+    # init
+    stack = util.Stack()
+    vertex = Vertex(problem.getStartState())
+    vertex.addNeighbor(problem.getSuccessors(vertex.name))
+
+    stack.push(vertex)
+    v = stack.pop()
+    print "pop: ", v.name, v.neighbors
+
+    # create graph and search
+    state = problem.getStartState()
+    while not problem.isGoalState(state):
+        successors = problem.getSuccessors(state)
+
+        # Strategy Search nodes
+        stack.push(successors)
+
+        # state = way[1];
+        way = successors[0]
+        point = way[0]
+        direction = way[1]
+        cost = way[2]
+        print successors
+        print point, direction
+        state = point
+        state = (1, 1)
+
+    return [direction]
+    # util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
