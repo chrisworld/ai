@@ -23,19 +23,9 @@ class Vertex:
     def __init__(self, n):
         self.name = n
         self.neighbors = util.Stack()
-        self.visited = 0
         self.parent = 0
         self.action = 'Stop'
-
-    def pushNeighbor(self, v):
-        self.neighbors.push(v)
-
-    def popNeighbor(self):
-        return self.neighbors.pop()
-
-    def noNeighbor(self):
-        return self.neighbors.isEmpty()
-
+        
 
 class SearchProblem:
     """
@@ -129,7 +119,7 @@ def depthFirstSearch(problem):
             # add neighbors
             for node in problem.getSuccessors(vertex.name):
                 if(node[0] != vertex.parent):
-                    vertex.pushNeighbor(node[0])
+                    vertex.neighbors.push(node[0])
                     print "neighbors: ", node[0]
 
             # mark expolred
@@ -137,11 +127,11 @@ def depthFirstSearch(problem):
 
             # choose next vertex to explored
             # jump back if no neighbors
-            if(vertex.noNeighbor()):
+            if(vertex.neighbors.isEmpty()):
                 pacman_state = vertex.parent
             # pop a neighbor
             else:
-                pacman_state = vertex.popNeighbor()
+                pacman_state = vertex.neighbors.pop()
                 stack.push(vertex)
             print "Packman: ", pacman_state
 
@@ -150,11 +140,11 @@ def depthFirstSearch(problem):
             # get parent
             vertex = stack.pop()
             # jump back if no neighbor
-            if(vertex.noNeighbor()):
+            if(vertex.neighbors.isEmpty()):
                 pacman_state = vertex.parent
             # pop a neighbor
             else:
-                pacman_state = vertex.popNeighbor()
+                pacman_state = vertex.neighbors.pop()
                 stack.push(vertex)
             print "Jump Back to: ", pacman_state
 
