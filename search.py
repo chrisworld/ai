@@ -112,6 +112,7 @@ def depthFirstSearch(problem):
     pacman_state = problem.getStartState()
     prev_state = pacman_state
     explored = list()
+    action = list()
 
     #stack.push(vertex)
     #print "pop: ", stack.pop().name
@@ -135,16 +136,30 @@ def depthFirstSearch(problem):
             explored.append(pacman_state)
 
             # choose next vertex to explored
-            if(not vertex.noNeighbor()):
+            # jump back if no neighbors
+            if(vertex.noNeighbor()):
+                pacman_state = vertex.parent
+            # pop a neighbor
+            else:
                 pacman_state = vertex.popNeighbor()
+                stack.push(vertex)
             print "Packman: ", pacman_state
-            #stack.push(vertex)
 
-    # direction
-    direction = "South"
+        # jump back
+        else:
+            # get parent
+            vertex = stack.pop()
+            # jump back if no neighbor
+            if(vertex.noNeighbor()):
+                pacman_state = vertex.parent
+            # pop a neighbor
+            else:
+                pacman_state = vertex.popNeighbor()
+                stack.push(vertex)
+            print "Jump Back to: ", pacman_state
 
     util.raiseNotDefined()
-    return [direction]
+    return [action]
     # util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
