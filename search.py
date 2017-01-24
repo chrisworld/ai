@@ -22,15 +22,19 @@ import util
 class Vertex:
     def __init__(self, n):
         self.name = n
-        self.neighbors = list()
+        self.neighbors = util.Stack()
         self.visited = 0
         self.parent = 0
         self.action = 'Stop'
 
-    def addNeighbor(self, v):
-        if v not in self.neighbors:
-            self.neighbors.append(v)
-            self.neighbors.sort()
+    def pushNeighbor(self, v):
+        self.neighbors.push(v)
+
+    def popNeighbor(self):
+        return self.neighbors.pop()
+
+    def noNeighbor(self):
+        return self.neighbors.isEmpty()
 
 
 class SearchProblem:
@@ -104,31 +108,42 @@ def depthFirstSearch(problem):
 
     # init
     stack = util.Stack()
-    vertex = Vertex(problem.getStartState())
-    vertex.addNeighbor(problem.getSuccessors(vertex.name))
 
-    stack.push(vertex)
-    v = stack.pop()
-    print "pop: ", v.name, v.neighbors
+    pacman_state = problem.getStartState()
+    prev_state = pacman_state
+    explored = list()
+
+    #stack.push(vertex)
+    #print "pop: ", stack.pop().name
 
     # create graph and search
-    state = problem.getStartState()
-    while not problem.isGoalState(state):
-        successors = problem.getSuccessors(state)
+    while not problem.isGoalState(pacman_state):
+        # explore
+        if(pacman_state not in explored):
+            # create vertex
+            vertex = Vertex(pacman_state)
+            vertex.parent = prev_state
+            prev_state = pacman_state
 
-        # Strategy Search nodes
-        stack.push(successors)
+            # add neighbors
+            for node in problem.getSuccessors(vertex.name):
+                if(node[0] != vertex.parent):
+                    vertex.pushNeighbor(node[0])
+                    print "neighbors: ", node[0]
 
-        # state = way[1];
-        way = successors[0]
-        point = way[0]
-        direction = way[1]
-        cost = way[2]
-        print successors
-        print point, direction
-        state = point
-        state = (1, 1)
+            # mark expolred
+            explored.append(pacman_state)
 
+            # choose next vertex to explored
+            if(not vertex.noNeighbor()):
+                pacman_state = vertex.popNeighbor()
+            print "Packman: ", pacman_state
+            #stack.push(vertex)
+
+    # direction
+    direction = "South"
+
+    util.raiseNotDefined()
     return [direction]
     # util.raiseNotDefined()
 
