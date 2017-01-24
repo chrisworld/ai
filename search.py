@@ -25,7 +25,7 @@ class Vertex:
         self.neighbors = util.Stack()
         self.parent = 0
         self.action = 'Stop'
-        
+
 
 class SearchProblem:
     """
@@ -119,8 +119,7 @@ def depthFirstSearch(problem):
             # add neighbors
             for node in problem.getSuccessors(vertex.name):
                 if(node[0] != vertex.parent):
-                    vertex.neighbors.push(node[0])
-                    print "neighbors: ", node[0]
+                    vertex.neighbors.push(node)
 
             # mark expolred
             explored.append(pacman_state)
@@ -131,9 +130,10 @@ def depthFirstSearch(problem):
                 pacman_state = vertex.parent
             # pop a neighbor
             else:
-                pacman_state = vertex.neighbors.pop()
+                node = vertex.neighbors.pop()
+                pacman_state = node[0]
+                vertex.action = node[1]
                 stack.push(vertex)
-            print "Packman: ", pacman_state
 
         # jump back
         else:
@@ -144,13 +144,16 @@ def depthFirstSearch(problem):
                 pacman_state = vertex.parent
             # pop a neighbor
             else:
-                pacman_state = vertex.neighbors.pop()
+                node = vertex.neighbors.pop()
+                pacman_state = node[0]
+                vertex.action = node[1]
                 stack.push(vertex)
-            print "Jump Back to: ", pacman_state
 
-    util.raiseNotDefined()
-    return [action]
-    # util.raiseNotDefined()
+    while(not stack.isEmpty()):
+        action.append(stack.pop().action)
+    action.reverse()
+    return action
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
