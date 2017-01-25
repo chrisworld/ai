@@ -98,14 +98,10 @@ def depthFirstSearch(problem):
 
     # init
     stack = util.Stack()
-
     pacman_state = problem.getStartState()
     prev_state = pacman_state
     explored = list()
     action = list()
-
-    #stack.push(vertex)
-    #print "pop: ", stack.pop().name
 
     # create graph and search
     while not problem.isGoalState(pacman_state):
@@ -158,6 +154,40 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+
+    # init
+    q_next = util.Queue()
+    q_vertices = util.Queue()
+    pacman_state = problem.getStartState()
+    prev_state = pacman_state
+    explored = list()
+    action = list()
+
+    # create graph and search
+    while not problem.isGoalState(pacman_state):
+        # explore
+        if(pacman_state not in explored):
+            # create vertex
+            vertex = Vertex(pacman_state)
+            vertex.parent = prev_state
+            prev_state = pacman_state
+
+            # add children
+            for node in problem.getSuccessors(vertex.name):
+                if(node[0] != vertex.parent and node[0] not in explored):
+                    q_next.push(node[0])
+
+            # mark expolred
+            explored.append(pacman_state)
+            q_vertices.push(vertex)
+
+        # choose next vertex to explored
+        pacman_state = q_next.pop()
+        print "Pacman: ", pacman_state
+
+    while(not q_vertices.isEmpty()):
+        print "Vertices: ", q_vertices.pop().name
+
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
