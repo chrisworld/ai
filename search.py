@@ -187,9 +187,10 @@ def breadthFirstSearch(problem):
             vertex.action = action
 
             # add children
-            for node in problem.getSuccessors(vertex.name):
-                if(node[0] != vertex.parent and node[0] not in explored):
-                    q_next.push((node[0], vertex.name, node[1]))
+            if(not problem.isGoalState(pacman_state)):
+                for node in problem.getSuccessors(vertex.name):
+                    if(node[0] != vertex.parent and node[0] not in explored):
+                        q_next.push((node[0], vertex.name, node[1]))
 
             # mark expolred
             explored.append(pacman_state)
