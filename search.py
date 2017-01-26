@@ -25,6 +25,7 @@ class Vertex:
         self.neighbors = util.Stack()
         self.parent = 0
         self.action = 'Stop'
+        self.actionlist = list()
 
 
 class SearchProblem:
@@ -157,11 +158,13 @@ def breadthFirstSearch(problem):
 
     # init
     q_next = util.Queue()
-    q_vertices = util.Queue()
+    q_vertices = util.Stack()
     pacman_state = problem.getStartState()
     prev_state = pacman_state
     explored = list()
     action = list()
+
+    #q_next.push(pacman_state)
 
     # create graph and search
     while not problem.isGoalState(pacman_state):
@@ -171,22 +174,30 @@ def breadthFirstSearch(problem):
             vertex = Vertex(pacman_state)
             vertex.parent = prev_state
             prev_state = pacman_state
+            vertex.action = action
 
             # add children
             for node in problem.getSuccessors(vertex.name):
                 if(node[0] != vertex.parent and node[0] not in explored):
-                    q_next.push(node[0])
+                    q_next.push(node)
 
             # mark expolred
             explored.append(pacman_state)
             q_vertices.push(vertex)
 
         # choose next vertex to explored
-        pacman_state = q_next.pop()
-        print "Pacman: ", pacman_state
+        if(not q_next.isEmpty()):
+            node = q_next.pop()
+            pacman_state = node[0]
+            action = node[1]
+
+        print "Pacman: ", pacman_state, action
 
     while(not q_vertices.isEmpty()):
-        print "Vertices: ", q_vertices.pop().name
+        vertex = q_vertices.pop()
+        action = vertex.action
+
+        print "Vertices: ", vertex.name, action
 
     util.raiseNotDefined()
 
