@@ -158,48 +158,55 @@ def breadthFirstSearch(problem):
 
     # init
     q_next = util.Queue()
+    q_action = util.Queue()
     q_vertices = util.Stack()
-    pacman_state = problem.getStartState()
-    prev_state = pacman_state
-    explored = list()
-    action = list()
 
-    #q_next.push(pacman_state)
+    pacman_state = problem.getStartState()
+    parent = pacman_state
+    action = 'Stop'
+
+    explored = list()
+    action_list = list()
+
+    q_next.push((pacman_state, parent, action))
 
     # create graph and search
     while not problem.isGoalState(pacman_state):
+        # choose next vertex to explored
+        if(not q_next.isEmpty()):
+            move = q_next.pop()
+            pacman_state = move[0]
+            parent = move[1]
+            action = move[2]
+
         # explore
         if(pacman_state not in explored):
             # create vertex
             vertex = Vertex(pacman_state)
-            vertex.parent = prev_state
-            prev_state = pacman_state
+            vertex.parent = parent
             vertex.action = action
 
             # add children
             for node in problem.getSuccessors(vertex.name):
                 if(node[0] != vertex.parent and node[0] not in explored):
-                    q_next.push(node)
+                    q_next.push((node[0], vertex.name, node[1]))
 
             # mark expolred
             explored.append(pacman_state)
             q_vertices.push(vertex)
 
-        # choose next vertex to explored
-        if(not q_next.isEmpty()):
-            node = q_next.pop()
-            pacman_state = node[0]
-            action = node[1]
-
-        print "Pacman: ", pacman_state, action
-
+    # traceback
+    vertex = q_vertices.pop()
+    action_list.append(vertex.action)
+    parent = vertex.parent
     while(not q_vertices.isEmpty()):
         vertex = q_vertices.pop()
-        action = vertex.action
+        if(vertex.name == parent and vertex.name != problem.getStartState()):
+            parent = vertex.parent
+            action_list.append(vertex.action)
 
-        print "Vertices: ", vertex.name, action
-
-    util.raiseNotDefined()
+    action_list.reverse()
+    return action_list
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
