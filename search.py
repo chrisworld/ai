@@ -162,13 +162,10 @@ def breadthFirstSearch(problem):
     q_vertices = util.Stack()
 
     pacman_state = problem.getStartState()
-    parent = pacman_state
-    action = 'Stop'
-
     explored = list()
     action_list = list()
 
-    q_next.push((pacman_state, parent, action))
+    q_next.push((pacman_state, action_list))
 
     # create graph and search
     while not problem.isGoalState(pacman_state):
@@ -176,38 +173,29 @@ def breadthFirstSearch(problem):
         if(not q_next.isEmpty()):
             move = q_next.pop()
             pacman_state = move[0]
-            parent = move[1]
-            action = move[2]
+            action_list = list(move[1])
 
         # explore
         if(pacman_state not in explored):
             # create vertex
             vertex = Vertex(pacman_state)
-            vertex.parent = parent
-            vertex.action = action
+            vertex.actionlist = action_list
 
             # add children
             if(not problem.isGoalState(pacman_state)):
                 for node in problem.getSuccessors(vertex.name):
                     if(node[0] != vertex.parent and node[0] not in explored):
-                        q_next.push((node[0], vertex.name, node[1]))
+                        alist = list(vertex.actionlist)
+                        alist.append(node[1])
+                        q_next.push((node[0], alist))
 
             # mark expolred
             explored.append(pacman_state)
-            q_vertices.push(vertex)
 
     # traceback
-    vertex = q_vertices.pop()
-    action_list.append(vertex.action)
-    parent = vertex.parent
-    while(not q_vertices.isEmpty()):
-        vertex = q_vertices.pop()
-        if(vertex.name == parent and vertex.name != problem.getStartState()):
-            parent = vertex.parent
-            action_list.append(vertex.action)
+    print "list: ", vertex.actionlist
+    return vertex.actionlist
 
-    action_list.reverse()
-    return action_list
 
 
 def uniformCostSearch(problem):
