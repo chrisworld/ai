@@ -26,6 +26,7 @@ class Vertex:
         self.parent = 0
         self.action = 'Stop'
         self.actionlist = list()
+        self.cost = 0
 
 
 class SearchProblem:
@@ -158,7 +159,6 @@ def breadthFirstSearch(problem):
 
     # init
     q_next = util.Queue()
-    q_action = util.Queue()
     q_vertices = util.Stack()
 
     pacman_state = problem.getStartState()
@@ -209,10 +209,65 @@ def breadthFirstSearch(problem):
     action_list.reverse()
     return action_list
 
+
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # init
+    q_next = util.PriorityQueue()
+    q_vertices = util.Stack()
+
+    pacman_state = problem.getStartState()
+    parent = pacman_state
+    action = 'Stop'
+    cost = 0
+
+    explored = list()
+    action_list = list()
+
+    q_next.push((pacman_state, parent, action, cost), cost)
+
+    # create graph and search
+    while not problem.isGoalState(pacman_state):
+        # choose next vertex to explored
+        if(not q_next.isEmpty()):
+            next_node = q_next.pop()
+            pacman_state = next_node[0]
+            parent = next_node[1]
+            action = next_node[2]
+            cost = next_node[3]
+
+        # explore
+        if(pacman_state not in explored):
+            # create vertex
+            vertex = Vertex(pacman_state)
+            vertex.parent = parent
+            vertex.action = action
+            vertex.cost = cost
+
+            # add children
+            if(not problem.isGoalState(pacman_state)):
+                for node in problem.getSuccessors(vertex.name):
+                    if(node[0] != vertex.parent and node[0] not in explored):
+                        cost = vertex.cost + node[2]
+                        q_next.push((node[0], vertex.name, node[1], cost), cost)
+
+            # mark expolred
+            explored.append(pacman_state)
+            q_vertices.push(vertex)
+
+    # traceback
+    vertex = q_vertices.pop()
+    action_list.append(vertex.action)
+    parent = vertex.parent
+    while(not q_vertices.isEmpty()):
+        vertex = q_vertices.pop()
+        if(vertex.name == parent and vertex.name != problem.getStartState()):
+            parent = vertex.parent
+            action_list.append(vertex.action)
+
+    action_list.reverse()
+    return action_list
 
 def nullHeuristic(state, problem=None):
     """
