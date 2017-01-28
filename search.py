@@ -152,7 +152,6 @@ def depthFirstSearch(problem):
     action.reverse()
     return action
 
-
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
@@ -194,7 +193,6 @@ def breadthFirstSearch(problem):
 
     # traceback
     return vertex.actionlist
-
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
@@ -251,11 +249,50 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    # init
+    q_next = util.PriorityQueue()
+    q_vertices = util.Stack()
 
     pacman_state = problem.getStartState()
     h_cost = heuristic(pacman_state, problem)
-    print "heuristic: ", h_cost
-    util.raiseNotDefined()
+    cost = h_cost
+    explored = list()
+    child_list = list()
+    action_list = list()
+
+    q_next.push((pacman_state, action_list, h_cost), h_cost)
+
+    # create graph and search
+    while not problem.isGoalState(pacman_state):
+        # choose next vertex to explored
+        if(not q_next.isEmpty()):
+            next_node = q_next.pop()
+            pacman_state = next_node[0]
+            action_list = list(next_node[1])
+            cost = next_node[2]
+
+        # explore
+        if(pacman_state not in explored):
+            # create vertex
+            vertex = Vertex(pacman_state)
+            vertex.actionlist = action_list
+            vertex.cost = cost
+
+            # add children
+            if(not problem.isGoalState(pacman_state)):
+                for node in problem.getSuccessors(vertex.name):
+                    if(node[0] not in explored):
+                        alist = list(vertex.actionlist)
+                        alist.append(node[1])
+                        h_cost = heuristic(node[0], problem)
+                        cost = vertex.cost + node[2]
+                        cost_sum = cost + h_cost
+                        q_next.push((node[0], alist, cost), cost_sum)
+
+        # mark explored
+        explored.append(pacman_state)
+    # traceback
+    return vertex.actionlist
 
 
 # Abbreviations
