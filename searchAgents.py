@@ -303,8 +303,11 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-
+        pos = state[0]
         c_state = list(state[1])
+        for c, c_s in enumerate(c_state):
+            if c_s == pos:
+                c_state[c] = 0
         return all(v == 0 for v in c_state)
 
     def getSuccessors(self, state):
@@ -328,7 +331,6 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
-            #print "state in succesors: ", state
             pos = state[0]
             c_state = list(state[1])
             x,y = pos
@@ -336,8 +338,9 @@ class CornersProblem(search.SearchProblem):
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
             if not hitsWall:
-                if pos in self.corners:
-                    print "corner reached: ", pos, c_state
+                for c, corner in enumerate(self.corners):
+                    if corner == pos:
+                        c_state[c] = 0
                 nextState = [(nextx, nexty), tuple(c_state)]
                 cost = 1
                 successors.append( (nextState, action, cost))

@@ -158,7 +158,6 @@ def breadthFirstSearch(problem):
 
     # init
     q_next = util.Queue()
-    q_vertices = util.Stack()
 
     pacman_state = problem.getStartState()
     explored = list()
@@ -181,9 +180,8 @@ def breadthFirstSearch(problem):
             # create vertex
             vertex = Vertex(pacman_state)
             vertex.actionlist = action_list
-            print "pacman: ", vertex.name
-            if(goal): break
 
+            if(goal): break
             # add children
             for node in problem.getSuccessors(vertex.name):
                 if(node[0] not in explored):
@@ -202,7 +200,6 @@ def uniformCostSearch(problem):
     "*** YOUR CODE HERE ***"
     # init
     q_next = util.PriorityQueue()
-    q_vertices = util.Stack()
 
     pacman_state = problem.getStartState()
     cost = 0
@@ -210,15 +207,17 @@ def uniformCostSearch(problem):
     action_list = list()
 
     q_next.push((pacman_state, action_list, cost), cost)
+    goal = problem.isGoalState(pacman_state)
 
     # create graph and search
-    while not problem.isGoalState(pacman_state):
+    while not goal:
         # choose next vertex to explored
         if(not q_next.isEmpty()):
             next_node = q_next.pop()
             pacman_state = next_node[0]
             action_list = list(next_node[1])
             cost = next_node[2]
+            goal = problem.isGoalState(pacman_state)
 
         # explore
         if(pacman_state not in explored):
@@ -227,14 +226,14 @@ def uniformCostSearch(problem):
             vertex.actionlist = action_list
             vertex.cost = cost
 
+            if(goal): break
             # add children
-            if(not problem.isGoalState(pacman_state)):
-                for node in problem.getSuccessors(vertex.name):
-                    if(node[0] != vertex.parent and node[0] not in explored):
-                        alist = list(vertex.actionlist)
-                        alist.append(node[1])
-                        cost = vertex.cost + node[2]
-                        q_next.push((node[0], alist, cost), cost)
+            for node in problem.getSuccessors(vertex.name):
+                if(node[0] not in explored):
+                    alist = list(vertex.actionlist)
+                    alist.append(node[1])
+                    cost = vertex.cost + node[2]
+                    q_next.push((node[0], alist, cost), cost)
 
             # mark expolred
             explored.append(pacman_state)
@@ -254,25 +253,25 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     # init
     q_next = util.PriorityQueue()
-    q_vertices = util.Stack()
 
     pacman_state = problem.getStartState()
     h_cost = heuristic(pacman_state, problem)
     cost = h_cost
     explored = list()
-    child_list = list()
     action_list = list()
 
     q_next.push((pacman_state, action_list, h_cost), h_cost)
+    goal = problem.isGoalState(pacman_state)
 
     # create graph and search
-    while not problem.isGoalState(pacman_state):
+    while not goal:
         # choose next vertex to explored
         if(not q_next.isEmpty()):
             next_node = q_next.pop()
             pacman_state = next_node[0]
             action_list = list(next_node[1])
             cost = next_node[2]
+            goal = problem.isGoalState(pacman_state)
 
         # explore
         if(pacman_state not in explored):
@@ -281,19 +280,20 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             vertex.actionlist = action_list
             vertex.cost = cost
 
+            if(goal): break
             # add children
-            if(not problem.isGoalState(pacman_state)):
-                for node in problem.getSuccessors(vertex.name):
-                    if(node[0] not in explored):
-                        alist = list(vertex.actionlist)
-                        alist.append(node[1])
-                        h_cost = heuristic(node[0], problem)
-                        cost = vertex.cost + node[2]
-                        cost_sum = cost + h_cost
-                        q_next.push((node[0], alist, cost), cost_sum)
+            for node in problem.getSuccessors(vertex.name):
+                if(node[0] not in explored):
+                    alist = list(vertex.actionlist)
+                    alist.append(node[1])
+                    h_cost = heuristic(node[0], problem)
+                    cost = vertex.cost + node[2]
+                    cost_sum = cost + h_cost
+                    q_next.push((node[0], alist, cost), cost_sum)
 
         # mark explored
         explored.append(pacman_state)
+
     # traceback
     return vertex.actionlist
 
