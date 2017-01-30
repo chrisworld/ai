@@ -340,6 +340,7 @@ class CornersProblem(search.SearchProblem):
             if not hitsWall:
                 for c, corner in enumerate(self.corners):
                     if corner == pos:
+                        #self.visited.append(corner)
                         c_state[c] = 0
                 nextState = [(nextx, nexty), tuple(c_state)]
                 cost = 1
@@ -379,7 +380,23 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    xy1 = state[0]
+    visited = list()
+    h_cost = list()
+
+    # get visited states
+    for c, corner in enumerate(state[1]):
+        if not corner:
+            visited.append(corners[c])
+
+    # Manhattan
+    for xy2 in corners:
+        if xy2 in visited:
+            continue
+        cost = abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+        h_cost.append(cost)
+
+    return min(h_cost)
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
