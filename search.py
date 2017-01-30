@@ -165,28 +165,31 @@ def breadthFirstSearch(problem):
     action_list = list()
 
     q_next.push((pacman_state, action_list))
+    goal = problem.isGoalState(pacman_state)
 
     # create graph and search
-    while not problem.isGoalState(pacman_state):
+    while not goal:
         # choose next vertex to explored
         if(not q_next.isEmpty()):
             move = q_next.pop()
             pacman_state = move[0]
             action_list = list(move[1])
+            goal = problem.isGoalState(pacman_state)
 
         # explore
         if(pacman_state not in explored):
             # create vertex
             vertex = Vertex(pacman_state)
             vertex.actionlist = action_list
+            print "pacman: ", vertex.name
+            if(goal): break
 
             # add children
-            if(not problem.isGoalState(pacman_state)):
-                for node in problem.getSuccessors(vertex.name):
-                    if(node[0] != vertex.parent and node[0] not in explored):
-                        alist = list(vertex.actionlist)
-                        alist.append(node[1])
-                        q_next.push((node[0], alist))
+            for node in problem.getSuccessors(vertex.name):
+                if(node[0] not in explored):
+                    alist = list(vertex.actionlist)
+                    alist.append(node[1])
+                    q_next.push((node[0], alist))
 
             # mark expolred
             explored.append(pacman_state)
