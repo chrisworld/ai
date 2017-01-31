@@ -490,30 +490,25 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    #food_lst = foodGrid.asList()
-    #print "Food list: ", food_lst
-    #print "Grid: ", position, foodGrid[position[0]][position[1]]
 
-    # Find closest node around view
+    # position is food
     pos_x, pos_y = position
-    x_range = (0, 1, -1)
-    y_range = (0, 1, -1)
 
     # food on position
     if foodGrid[pos_x][pos_y]:
         return 0
 
-    # my range check
-    for dx in x_range:
-        for dy in y_range:
-            c_x = pos_x + dx
-            c_y = pos_y + dy
-            if foodGrid[c_x][c_y]:
-                euclidean = (dx ** 2 + dy ** 2) ** 0.5
-                #print "hit: ", c_x, c_y, euclidean
-                return -euclidean
+    # Manhattan
+    food_lst = foodGrid.asList()
+    if(not len(food_lst)):
+        return 0
 
-    return 1
+    h_cost = list()
+    for xy2 in food_lst:
+        cost = abs(pos_x - xy2[0]) + abs(pos_y - xy2[1])
+        h_cost.append(cost)
+
+    return min(h_cost)
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
