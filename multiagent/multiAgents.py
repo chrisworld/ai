@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -48,6 +48,7 @@ class ReflexAgent(Agent):
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
         "Add more of your code here if you want to"
+        #print "Scoressss:", scores
 
         return legalMoves[chosenIndex]
 
@@ -74,7 +75,28 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        #print "successor: ", newPos
+        #print newFood.asList()
+        #print newFood, "\n"
+
+        # ghost points
+        g_points = -5
+        ghost_pos_lst = successorGameState.getGhostPositions()
+        if ghost_pos_lst:
+            g_points = g_points + max([util.manhattanDistance(newPos, ghost_pos)
+            for ghost_pos in ghost_pos_lst])
+
+        # distance points
+        d_points = 5
+        food_lst = newFood.asList()
+        if food_lst:
+            d_points = d_points - min([util.manhattanDistance(newPos, food_pos)
+            for food_pos in food_lst])
+
+        #print "distance points: ", d_points
+        #print "gohst points: ", g_points
+
+        return successorGameState.getScore() + d_points + g_points
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -170,4 +192,3 @@ def betterEvaluationFunction(currentGameState):
 
 # Abbreviation
 better = betterEvaluationFunction
-
