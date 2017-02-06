@@ -14,7 +14,6 @@
 # ReflexAgent:
 #
 python pacman.py -p ReflexAgent
-
 python pacman.py -p ReflexAgent -l testClassic
 python pacman.py -p ReflexAgent -l testClassic -g DirectionalGhost
 
@@ -25,3 +24,22 @@ python pacman.py --frameTime 0 -p ReflexAgent -k 2 -g DirectionalGhost
 
 python autograder.py -q q1
 python autograder.py -q q1 --no-graphics
+
+# MinimaxAgent
+#
+python autograder.py -q q2
+python autograder.py -q q2 --no-graphics
+python pacman.py -p MinimaxAgent -l minimaxClassic -a depth=4
+python pacman.py -p MinimaxAgent -l trappedClassic -a depth=3
+
+
+
+
+
+
+
+
+
+
+
+# end
