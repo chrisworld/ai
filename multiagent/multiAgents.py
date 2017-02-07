@@ -152,15 +152,26 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         print "depth: ", self.depth
-        print "Agendts: ", gameState.getNumAgents()
-        agent_index = 0
-        print "agent index: ", agent_index
-        actions = gameState.getLegalActions(agent_index)
-        for action  in actions:
-            print "legal action: ", action
-            print "success:\n", gameState.generateSuccessor(agent_index, action)
-            print "self.evaluationFunction:", self.evaluationFunction
+        scores = list()
 
+        for agent_index in range(gameState.getNumAgents()):
+            print "agent index: ", agent_index
+            actions = gameState.getLegalActions(agent_index)
+            for action  in actions:
+                print "legal action: ", action
+                sGameState = gameState.generateSuccessor(agent_index, action)
+                print "success:\n", sGameState
+                print "eval:", self.evaluationFunction(sGameState)
+                scores.append(self.evaluationFunction(sGameState))
+                print "\n"
+
+        bestScore = max(scores)
+        bestIndices = [index for index in range(len(scores))
+        if scores[index] == bestScore]
+        chosenIndex = random.choice(bestIndices)
+
+        print "scorses: ", scores
+        print "chosen: ", chosenIndex
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
