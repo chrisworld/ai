@@ -155,6 +155,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         best_pacman_scores = list()
         best_ghost_scores = list()
+        gameState_tree = list()
+
+        for depth in range(self.depth):
+            print "depth: ", depth
+
         pacman_actions = gameState.getLegalActions(0)
         print "\n-----new Choice-----"
         for pacman_action  in pacman_actions:
@@ -172,6 +177,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
                     ghostGameState = pacmanGameState.generateSuccessor(ghost_index, ghost_action)
                     ghost_scores.append(self.evaluationFunction(ghostGameState))
                     #print "ghost scores: ",ghost_scores
+                    print "ghost move: \n", ghostGameState
+                    #gameState_tree[depth][]
 
             if ghost_scores:
                 best_ghost_scores.append(min(ghost_scores))
@@ -187,6 +194,31 @@ class MinimaxAgent(MultiAgentSearchAgent):
         print "bestIndices", bestIndices
         print "Pacman Action: ", pacman_actions[chosenIndex]
         return pacman_actions[chosenIndex]
+
+    def getMax(gameState):
+        v_max = -999
+        pacman_actions = gameState.getLegalActions(0)
+        for pacman_action  in pacman_actions:
+            # pacman moves
+            newGameState = gameState.generateSuccessor(0, pacman_action)
+            v_max = max(v_max, getMin(newGameState))
+            print "pacman action: ", pacman_action
+            print newGameState
+            print "v_max: ", v_max
+        return v_max
+
+    def getMin(gameState):
+        v_min = 999
+        for ghost_index in range(1, gameState.getNumAgents()):
+            ghost_actions = gameState.getLegalActions(ghost_index)
+            for ghost_action in ghost_actions:
+                newGameState = gameState.generateSuccessor(ghost_index, ghost_action)
+                v_min = min(v_min, getMax(newGameState))
+                #print "ghost scores: ",ghost_scores
+                print "ghost action: ", ghost_action
+                print newGameState
+                print "v_min: ", v_min
+        return v_min
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
