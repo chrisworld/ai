@@ -151,28 +151,42 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        print "depth: ", self.depth
-        scores = list()
+        #print "depth: ", self.depth
 
-        for agent_index in range(gameState.getNumAgents()):
-            print "agent index: ", agent_index
-            actions = gameState.getLegalActions(agent_index)
-            for action  in actions:
-                print "legal action: ", action
-                sGameState = gameState.generateSuccessor(agent_index, action)
-                print "success:\n", sGameState
-                print "eval:", self.evaluationFunction(sGameState)
-                scores.append(self.evaluationFunction(sGameState))
-                print "\n"
+        best_pacman_scores = list()
+        best_ghost_scores = list()
+        pacman_actions = gameState.getLegalActions(0)
+        print "\n-----new Choice-----"
+        for pacman_action  in pacman_actions:
+            # pacman moves
+            pacmanGameState = gameState.generateSuccessor(0, pacman_action)
+            print "pacman action: ", pacman_action
+            print pacmanGameState
 
-        bestScore = max(scores)
-        bestIndices = [index for index in range(len(scores))
-        if scores[index] == bestScore]
+            # ghost moves
+            ghost_scores = list()
+            for ghost_index in range(1, gameState.getNumAgents()):
+                ghost_actions = pacmanGameState.getLegalActions(ghost_index)
+
+                for ghost_action in ghost_actions:
+                    ghostGameState = pacmanGameState.generateSuccessor(ghost_index, ghost_action)
+                    ghost_scores.append(self.evaluationFunction(ghostGameState))
+                    #print "ghost scores: ",ghost_scores
+
+            if ghost_scores:
+                best_ghost_scores.append(min(ghost_scores))
+            else:
+                best_ghost_scores.append(self.evaluationFunction(pacmanGameState))
+                #best_ghost_scores.append(-999)
+
+        print "min score: ", best_ghost_scores
+        bestScore = max(best_ghost_scores)
+        bestIndices = [index for index in range(len(best_ghost_scores))
+        if best_ghost_scores[index] == bestScore]
         chosenIndex = random.choice(bestIndices)
-
-        print "scorses: ", scores
-        print "chosen: ", chosenIndex
-        util.raiseNotDefined()
+        print "bestIndices", bestIndices
+        print "Pacman Action: ", pacman_actions[chosenIndex]
+        return pacman_actions[chosenIndex]
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
