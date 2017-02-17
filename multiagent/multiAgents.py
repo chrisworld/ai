@@ -155,43 +155,34 @@ class MinimaxAgent(MultiAgentSearchAgent):
         def getMax(gameState, current_depth):
             v_max = (-99999, 'Stop')
             pacman_actions = gameState.getLegalActions(0)
-
             # leaves
             if not pacman_actions or current_depth > self.depth:
                 return (self.evaluationFunction(gameState), 'Stop')
-
             # Branches
             for pacman_action in pacman_actions:
                 newGameState = gameState.generateSuccessor(0, pacman_action)
-                v_max = (max(v_max[0], getMin(newGameState, 1, current_depth)), pacman_action)
-
+                v_min = (getMin(newGameState, 1, current_depth), pacman_action)
+                v_max = max(v_max, v_min)
             return v_max
 
         def getMin(gameState, ghost_index, current_depth):
             v_min = 99999
             ghost_actions = gameState.getLegalActions(ghost_index)
-
             # leaves
             if not ghost_actions:
                 return self.evaluationFunction(gameState)
-
             # Branches
             for ghost_action in ghost_actions:
                 newGameState = gameState.generateSuccessor(ghost_index, ghost_action)
                 if ghost_index < (gameState.getNumAgents() - 1):
-                    v_min = min(v_min, getMin(newGameState, ghost_index + 1, current_depth))
+                    v_new = getMin(newGameState, ghost_index + 1, current_depth)
+                    v_min = min(v_min, v_new)
                 else:
-                    v_min = min(v_min, getMax(newGameState, current_depth + 1)[0])
-
+                    v_max = getMax(newGameState, current_depth + 1)[0]
+                    v_min = min(v_min, v_max)
             return v_min
 
-        pacman = getMax(gameState, 1)
-        #print "ghost agent: ", ghost_index
-        #print "ghost action: ", ghost_action
-        #print newGameState
-        #print "v_min: ", v_min
-        #print pacman
-        return pacman[1]
+        return getMax(gameState, 1)[1]
 
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
