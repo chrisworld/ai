@@ -151,12 +151,9 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        #print "depth: ", self.depth
-        current_depth = 1;
 
         def getMax(gameState, current_depth):
-            v_max = (-999, 'Stop')
-            current_depth = current_depth + 1
+            v_max = (-99999, 'Stop')
             pacman_actions = gameState.getLegalActions(0)
 
             # leaves
@@ -166,36 +163,34 @@ class MinimaxAgent(MultiAgentSearchAgent):
             # Branches
             for pacman_action in pacman_actions:
                 newGameState = gameState.generateSuccessor(0, pacman_action)
-                v_max = (max(v_max[0], getMin(newGameState, current_depth)), pacman_action)
-                #print "current depth: ", current_depth
-                #print "pacman action: ", pacman_action
-                #print newGameState
-                #print "v_max: ", v_max
+                v_max = (max(v_max[0], getMin(newGameState, 1, current_depth)), pacman_action)
+
             return v_max
 
-        def getMin(gameState, current_depth):
-            v_min = 999
-            for ghost_index in range(1, gameState.getNumAgents()):
-                ghost_actions = gameState.getLegalActions(ghost_index)
+        def getMin(gameState, ghost_index, current_depth):
+            v_min = 99999
+            ghost_actions = gameState.getLegalActions(ghost_index)
 
-                # leaves
-                if not ghost_actions:
-                    v_min = min(v_min, self.evaluationFunction(gameState))
-                    #print "ghost agent: ", ghost_index
-                    continue
+            # leaves
+            if not ghost_actions:
+                return self.evaluationFunction(gameState)
 
-                # Branches
-                for ghost_action in ghost_actions:
-                    newGameState = gameState.generateSuccessor(ghost_index, ghost_action)
-                    v_min = min(v_min, getMax(newGameState, current_depth)[0])
-                    #print "ghost agent: ", ghost_index
-                    #print "ghost action: ", ghost_action
-                    #print newGameState
-                    #print "v_min: ", v_min
+            # Branches
+            for ghost_action in ghost_actions:
+                newGameState = gameState.generateSuccessor(ghost_index, ghost_action)
+                if ghost_index < (gameState.getNumAgents() - 1):
+                    v_min = min(v_min, getMin(newGameState, ghost_index + 1, current_depth))
+                else:
+                    v_min = min(v_min, getMax(newGameState, current_depth + 1)[0])
+
             return v_min
 
-        pacman = getMax(gameState, current_depth)
-        print pacman
+        pacman = getMax(gameState, 1)
+        #print "ghost agent: ", ghost_index
+        #print "ghost action: ", ghost_action
+        #print newGameState
+        #print "v_min: ", v_min
+        #print pacman
         return pacman[1]
 
 
