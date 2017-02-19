@@ -75,28 +75,46 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        #print "successor: ", newPos
-        #print newFood.asList()
-        #print newFood, "\n"
 
-        # ghost points
-        g_points = -5
-        ghost_pos_lst = successorGameState.getGhostPositions()
-        if ghost_pos_lst:
-            g_points = g_points + max([util.manhattanDistance(newPos, ghost_pos)
-            for ghost_pos in ghost_pos_lst])
-
-        # distance points
-        d_points = 5
+        # food points
+        f_points = 1
         food_lst = newFood.asList()
         if food_lst:
-            d_points = d_points - min([util.manhattanDistance(newPos, food_pos)
-            for food_pos in food_lst])
+            f_dis = min([util.manhattanDistance(newPos, food_pos) for food_pos in food_lst])
+            if not f_dis: f_dis = 1
+            f_points = f_points * (1.0 / f_dis)
 
-        #print "distance points: ", d_points
-        #print "gohst points: ", g_points
+        # capsule points
+        c_points = 2
+        capsules = successorGameState.getCapsules();
+        if capsules:
+            c_dis = min([util.manhattanDistance(newPos, capsule) for capsule in capsules])
+            if c_dis < 1: c_points = 10
+            if not c_dis: c_dis = 1
+            c_points = c_points * (1.0 / c_dis)
 
-        return successorGameState.getScore() + d_points + g_points
+        # ghost points
+        g_points = -2
+        ghost_lst = successorGameState.getGhostPositions()
+        if ghost_lst:
+            g_dis = min([util.manhattanDistance(newPos, ghost_pos) for ghost_pos in ghost_lst])
+            if not g_dis: g_dis = 1
+            g_points = g_points * (1.0 / g_dis)
+
+        # ghost buster points
+        b_points = 4
+        if newScaredTimes:
+            g_dis = list()
+            for ghost_index, scaredTime in enumerate(newScaredTimes):
+                if scaredTime:
+                    g_dis.append(util.manhattanDistance(newPos, ghost_lst[ghost_index]))
+                    ghost_points = 0
+                else: g_dis.append(100)
+            g_dis = min(g_dis)
+            if not g_dis: g_dis = 1
+            b_points = b_points * (1.0 / g_dis)
+
+        return successorGameState.getScore() + f_points + g_points + c_points + b_points
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -296,7 +314,52 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #successorGameState = currentGameState.generatePacmanSuccessor(action)
+    pacman_pos = currentGameState.getPacmanPosition()
+    food = currentGameState.getFood()
+    capsules = currentGameState.getCapsules();
+    ghosts = currentGameState.getGhostStates()
+    scaredTimes = [ghost.scaredTimer for ghost in ghosts]
+
+    # food points
+    f_points = 1
+    food_lst = food.asList()
+    if food_lst:
+        f_dis = min([util.manhattanDistance(pacman_pos, food_pos) for food_pos in food_lst])
+        if not f_dis: f_dis = 1
+        f_points = f_points * (1.0 / f_dis)
+
+    # capsule points
+    c_points = 2
+    capsules = currentGameState.getCapsules();
+    if capsules:
+        c_dis = min([util.manhattanDistance(pacman_pos, capsule) for capsule in capsules])
+        if c_dis < 1: c_points = 10
+        if not c_dis: c_dis = 1
+        c_points = c_points * (1.0 / c_dis)
+
+    # ghost points
+    g_points = -2
+    ghost_lst = currentGameState.getGhostPositions()
+    if ghost_lst:
+        g_dis = min([util.manhattanDistance(pacman_pos, ghost_pos) for ghost_pos in ghost_lst])
+        if not g_dis: g_dis = 1
+        g_points = g_points * (1.0 / g_dis)
+
+    # ghost buster points
+    b_points = 4
+    if scaredTimes:
+        g_dis = list()
+        for ghost_index, scaredTime in enumerate(scaredTimes):
+            if scaredTime:
+                g_dis.append(util.manhattanDistance(pacman_pos, ghost_lst[ghost_index]))
+                ghost_points = 0
+            else: g_dis.append(100)
+        g_dis = min(g_dis)
+        if not g_dis: g_dis = 1
+        b_points = b_points * (1.0 / g_dis)
+
+    return currentGameState.getScore() + f_points + g_points + c_points + b_points
 
 # Abbreviation
 better = betterEvaluationFunction
