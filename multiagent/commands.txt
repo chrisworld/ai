@@ -37,6 +37,17 @@ python autograder.py -q q3
 python autograder.py -q q3 --no-graphics
 python autograder.py -t test_cases\q3\0-lecture-6-tree
 
+# ExpectimaxAgent
+#
+python autograder.py -q q4
+python autograder.py -q q4 --no-graphics
+python autograder.py -t test_cases\q4\0-expectimax1
+python autograder.py -t test_cases\q4\3-one-ghost-4level
+python autograder.py -t test_cases\q4\5-two-ghosts-4level
+
+python pacman.py -p ExpectimaxAgent -l minimaxClassic -a depth=3
+python pacman.py -p AlphaBetaAgent -l trappedClassic -a depth=3 -q -n 10
+python pacman.py -p ExpectimaxAgent -l trappedClassic -a depth=3 -q -n 10
 
 
 
