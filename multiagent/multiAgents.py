@@ -152,7 +152,16 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
 
-        def getMax(gameState, current_depth):
+        def value(gameState, agent_index, current_depth):
+            if agent_index == gameState.getNumAgents():
+                agent_index = 0;
+            # Choose Min or Max
+            if agent_index == 0:
+                return maxValue(gameState, current_depth + 1)[0]
+            else:
+                return minValue(gameState, agent_index, current_depth)
+
+        def maxValue(gameState, current_depth):
             v_max = (-99999, 'Stop')
             pacman_actions = gameState.getLegalActions(0)
             # leaves
@@ -161,11 +170,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
             # Branches
             for pacman_action in pacman_actions:
                 newGameState = gameState.generateSuccessor(0, pacman_action)
-                v_min = (getMin(newGameState, 1, current_depth), pacman_action)
-                v_max = max(v_max, v_min)
+                v_max = max(v_max, (value(newGameState, 1, current_depth), pacman_action))
             return v_max
 
-        def getMin(gameState, ghost_index, current_depth):
+        def minValue(gameState, ghost_index, current_depth):
             v_min = 99999
             ghost_actions = gameState.getLegalActions(ghost_index)
             # leaves
@@ -174,15 +182,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
             # Branches
             for ghost_action in ghost_actions:
                 newGameState = gameState.generateSuccessor(ghost_index, ghost_action)
-                if ghost_index < (gameState.getNumAgents() - 1):
-                    v_new = getMin(newGameState, ghost_index + 1, current_depth)
-                    v_min = min(v_min, v_new)
-                else:
-                    v_max = getMax(newGameState, current_depth + 1)[0]
-                    v_min = min(v_min, v_max)
+                v_min = min(v_min, value(newGameState, ghost_index + 1, current_depth))
             return v_min
 
-        return getMax(gameState, 1)[1]
+        return maxValue(gameState, 1)[1]
 
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
@@ -195,16 +198,17 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        def value(gameState, agent_index, current_depth):
-            if agent_index == (gameState.getNumAgents() - 1):
+
+        def value(gameState, agent_index, current_depth, alpha, beta):
+            if agent_index == gameState.getNumAgents():
                 agent_index = 0;
             # Choose Min or Max
             if agent_index == 0:
-                return getMax(gameState, current_depth + 1)
+                return maxValue(gameState, current_depth + 1, alpha, beta)[0]
             else:
-                return getMin(gameState, agent_index + 1, current_depth)
+                return minValue(gameState, agent_index, current_depth, alpha, beta)
 
-        def getMax(gameState, current_depth):
+        def maxValue(gameState, current_depth, alpha, beta):
             v_max = (-99999, 'Stop')
             pacman_actions = gameState.getLegalActions(0)
             # leaves
@@ -213,11 +217,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             # Branches
             for pacman_action in pacman_actions:
                 newGameState = gameState.generateSuccessor(0, pacman_action)
-                v_new = (value(newGameState, 1, current_depth), pacman_action)
-                v_max = max(v_max, v_new)
+                v_max = max(v_max, (value(newGameState, 1, current_depth, alpha, beta), pacman_action))
+                if v_max[0] > beta: return v_max
+                alpha = max(alpha, v_max[0])
             return v_max
 
-        def getMin(gameState, ghost_index, current_depth):
+        def minValue(gameState, ghost_index, current_depth, alpha, beta):
             v_min = 99999
             ghost_actions = gameState.getLegalActions(ghost_index)
             # leaves
@@ -226,11 +231,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             # Branches
             for ghost_action in ghost_actions:
                 newGameState = gameState.generateSuccessor(ghost_index, ghost_action)
-                v_new = value(newGameState, ghost_index, current_depth)
-                v_min = min(v_min, v_new)
+                v_min = min(v_min, value(newGameState, ghost_index + 1, current_depth, alpha, beta))
+                if v_min < alpha: return v_min
+                beta = min(beta, v_min)
             return v_min
 
-        return getMax(gameState, 1)[1]
+        return maxValue(gameState, 1, -99999, 99999)[1]
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
