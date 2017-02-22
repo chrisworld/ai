@@ -15,7 +15,8 @@
 from util import manhattanDistance
 from game import Directions
 import random, util
-
+import search
+import searchAgents
 from game import Agent
 
 class ReflexAgent(Agent):
@@ -48,7 +49,6 @@ class ReflexAgent(Agent):
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
         "Add more of your code here if you want to"
-        #print "Scoressss:", scores
 
         return legalMoves[chosenIndex]
 
@@ -100,17 +100,10 @@ class ReflexAgent(Agent):
             g_dis = min([[util.manhattanDistance(newPos, ghost), ghost_index] for ghost_index, ghost in enumerate(ghost_lst)])
             if not g_dis[0]: g_dis[0] = 1
             g_points = g_points * (1.0 / g_dis[0])
-            if g_dis[0] < 2: g_points = -10.0 / g_dis[0]
+            if g_dis[0] < 2: g_points = -20.0 / g_dis[0]
             if newScaredTimes[g_dis[1]]:
                 g_points = 0
                 b_points = 4.0 * (1.0 / g_dis[0]) * (newScaredTimes[g_dis[1]] / 40.0)
-
-        #print "\nnewScaredTimes[g_dis[1]]: ", newScaredTimes[g_dis[1]]
-        #print "g_points: ", g_points
-        #print "b_points: ", b_points
-        #print "c_pints: ", c_points
-        #print "f_pints: ", f_points
-        #print "score: ", successorGameState.getScore() + f_points + g_points + c_points + b_points
 
         return successorGameState.getScore() + f_points + g_points + c_points + b_points
 
@@ -310,14 +303,16 @@ def betterEvaluationFunction(currentGameState):
       evaluation function (question 5).
 
       DESCRIPTION: <write something here so we know what you did>
+      giving food, capsule, ghost and ghost-buster points
     """
     "*** YOUR CODE HERE ***"
-    #successorGameState = currentGameState.generatePacmanSuccessor(action)
+
     pacman_pos = currentGameState.getPacmanPosition()
     food = currentGameState.getFood()
     capsules = currentGameState.getCapsules();
     ghosts = currentGameState.getGhostStates()
     scaredTimes = [ghost.scaredTimer for ghost in ghosts]
+    score = currentGameState.getScore()
 
     # food points
     f_points = 1
@@ -327,12 +322,11 @@ def betterEvaluationFunction(currentGameState):
         if not f_dis: f_dis = 1
         f_points = f_points * (1.0 / f_dis)
 
-    # capsule points
+    # capsule points 1134.6
     c_points = 2
     capsules = currentGameState.getCapsules();
     if capsules:
         c_dis = min([util.manhattanDistance(pacman_pos, capsule) for capsule in capsules])
-        if c_dis < 1: c_points = 10
         if not c_dis: c_dis = 1
         c_points = c_points * (1.0 / c_dis)
 
@@ -344,12 +338,30 @@ def betterEvaluationFunction(currentGameState):
         g_dis = min([[util.manhattanDistance(pacman_pos, ghost), ghost_index] for ghost_index, ghost in enumerate(ghost_lst)])
         if not g_dis[0]: g_dis[0] = 1
         g_points = g_points * (1.0 / g_dis[0])
-        if g_dis[0] < 2: g_points = -10.0 / g_dis[0]
+        if g_dis[0] < 2: g_points = -20.0 / g_dis[0]
         if scaredTimes[g_dis[1]]:
             g_points = 0
             b_points = 4.0 * (1.0 / g_dis[0]) * (scaredTimes[g_dis[1]] / 40.0)
 
-    return currentGameState.getScore() + f_points + g_points + c_points + b_points
+    # direction points 1170.7
+    f_points = 0
+    c_points = 0
+    d_points = 4
+    problem = searchAgents.AnyFoodSearchProblem2(currentGameState)
+    search.bfs(problem)
+    d_points = d_points * (1.0 / len(search.bfs(problem)))
+
+    #print "\nnewScaredTimes[g_dis[1]]: ", scaredTimes[g_dis[1]]
+    #print "g_points: ", g_points
+    #print "b_points: ", b_points
+    #print "c_pints: ", c_points
+    #print "f_pints: ", f_points
+    #print "d_pints: ", d_points
+    #print "score: ", score
+    #print "sum: ", score + f_points + g_points + c_points + b_points + d_points
+    #print currentGameState
+
+    return score + f_points + g_points + c_points + b_points + d_points
 
 # Abbreviation
 better = betterEvaluationFunction
