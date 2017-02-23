@@ -303,7 +303,8 @@ def betterEvaluationFunction(currentGameState):
       evaluation function (question 5).
 
       DESCRIPTION: <write something here so we know what you did>
-      giving food, capsule, ghost and ghost-buster points
+      summing all features: score, ghost points, ghost-buster points and
+      distance points which is a search function to the closest food or capsule
     """
     "*** YOUR CODE HERE ***"
 
@@ -312,25 +313,8 @@ def betterEvaluationFunction(currentGameState):
     capsules = currentGameState.getCapsules();
     ghosts = currentGameState.getGhostStates()
     scaredTimes = [ghost.scaredTimer for ghost in ghosts]
-    score = currentGameState.getScore()
 
-    # food points
-    f_points = 1
-    food_lst = food.asList()
-    if food_lst:
-        f_dis = min([util.manhattanDistance(pacman_pos, food_pos) for food_pos in food_lst])
-        if not f_dis: f_dis = 1
-        f_points = f_points * (1.0 / f_dis)
-
-    # capsule points 1134.6
-    c_points = 2
-    capsules = currentGameState.getCapsules();
-    if capsules:
-        c_dis = min([util.manhattanDistance(pacman_pos, capsule) for capsule in capsules])
-        if not c_dis: c_dis = 1
-        c_points = c_points * (1.0 / c_dis)
-
-    # ghost points and buster points
+    # ghost points and ghost buster points
     g_points = -2
     b_points = 0
     ghost_lst = currentGameState.getGhostPositions()
@@ -341,27 +325,14 @@ def betterEvaluationFunction(currentGameState):
         if g_dis[0] < 2: g_points = -20.0 / g_dis[0]
         if scaredTimes[g_dis[1]]:
             g_points = 0
-            b_points = 4.0 * (1.0 / g_dis[0]) * (scaredTimes[g_dis[1]] / 40.0)
+            b_points = 10.0 * (1.0 / g_dis[0]) * (scaredTimes[g_dis[1]] / 40.0)
 
-    # direction points 1170.7
-    f_points = 0
-    c_points = 0
+    # distance points
     d_points = 4
     problem = searchAgents.AnyFoodSearchProblem2(currentGameState)
-    search.bfs(problem)
     d_points = d_points * (1.0 / len(search.bfs(problem)))
 
-    #print "\nnewScaredTimes[g_dis[1]]: ", scaredTimes[g_dis[1]]
-    #print "g_points: ", g_points
-    #print "b_points: ", b_points
-    #print "c_pints: ", c_points
-    #print "f_pints: ", f_points
-    #print "d_pints: ", d_points
-    #print "score: ", score
-    #print "sum: ", score + f_points + g_points + c_points + b_points + d_points
-    #print currentGameState
-
-    return score + f_points + g_points + c_points + b_points + d_points
+    return currentGameState.getScore() + g_points + b_points + d_points
 
 # Abbreviation
 better = betterEvaluationFunction
