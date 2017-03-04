@@ -1,0 +1,5 @@
+python gridworld.py -h
+python gridworld.py -g MazeGrid -t
+
+python autograder.py -q q1
+python gridworld.py -a value -i 100 -k 10
